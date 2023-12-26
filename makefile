@@ -37,6 +37,6 @@ clean:
 
 # NOTE: make clean first
 release: OBJ_FLAGS = -O3
-release: clean $(OBJ)
-	$(COMPILER) $(RELEASE_FLAGS) $^ -o $(APP)-$@ $(SOURCE_LIBS)
+release: $(OBJ)
+	$(COMPILER) $^ -o $(APP)-$@ $(RELEASE_FLAGS) $(SOURCE_LIBS)
 

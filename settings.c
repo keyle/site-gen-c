@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <strings.h>
 
 void unmarshal_settings(Settings *settings) {
     char *settings_json = read_file_content("/Users/n/.config/site-gen/settings.json");

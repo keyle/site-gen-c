@@ -1,10 +1,12 @@
 #include "settings.h"
 #include "utils.h"
-// #include "libs/md4c/src/md4c.h"
-// #include "libs/md4c/src/md4c-html.h"
-
+#include "md.h"
 #include "libs/md4c.h"
 #include "libs/md4c-html.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <strings.h>
 
 void markdown_html(const char *);
 
@@ -16,17 +18,18 @@ int main() {
     // MD_PARSER *p = malloc(sizeof(MD_PARSER *));
     Settings *settings = malloc(sizeof(Settings));
     unmarshal_settings(settings);
-    findMarkdownInFolders(settings->workdir, &markdowns, &i);
 
-    // printf("markdowns:\n");
+    find_markdown_files(settings->workdir, &markdowns, &i);
+
     // for (int j = 0; j < i; j++) {
     //     printf("md: %s\n", markdowns[j]);
     //     char *t = "*some text*";
-    //     // TODO actually parse the thing
 
-    //     int res = md_parse(t, strlen(t) + 1, p, v); // TODO next the v is wrong here? pointer to user data? check the doco
+    //     int res = md_parse(t, strlen(t) + 1, p, v);
     //     printf("%i\n", res);
     // }
+
+    // TODO @next check the process in ocaml and rewrite it in C
 
     markdown_html("# Hello, Newb!\n\nThis is a simple test. <x-title>this was already a title</x-title>");
 
@@ -35,7 +38,6 @@ int main() {
 
 void process_output(const MD_CHAR *output, MD_SIZE size, void *userdata) {
     // Write or process the HTML output
-    // printf("%s\n", output);
     fwrite(output, size, 1, stdout); // For example, write to stdout
 }
 
