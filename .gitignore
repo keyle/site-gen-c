@@ -1,0 +1,11 @@
+*.o
+site-gen-c*
+site-gen-c/
+*.dSYM/
+*.su
+*.d
+.DS_Store
+*.iml
+*.iws
+.vscode/
+.idea/
