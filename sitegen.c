@@ -4,15 +4,20 @@
 #include "libs/md4c-html.h"
 #include <strings.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-void process_output(const MD_CHAR* output, MD_SIZE size, void* userdata) {
+void process_output(const MD_CHAR output[static 1], MD_SIZE size, void* userdata) {
     // Write or process the HTML output
     fwrite(output, size, 1, stdout); // For example, write to stdout
+    if (!userdata) {
+        fprintf(stderr, "could not pass user data in process_output");
+        exit(1);
+    }
     Article* article = userdata;
     article->html = strdup(output);
 }
 
-void process(Settings* settings, Article* article, const char* markdownPath) {
+void process(Settings settings[static 1], Article article[static 1], const char markdownPath[static 1]) {
     const char* markdown = read_file_content(markdownPath);
     article->markdown = strdup(markdown);
 

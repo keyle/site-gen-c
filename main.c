@@ -7,6 +7,14 @@
 
 #define MAX_MD 200
 
+#define for_in(item, array, length) \
+    for (int keep = 1,              \
+             count = 0,             \
+             size = length;         \
+         keep && count != size;     \
+         keep = !keep, count++)     \
+        for (item = (array)[count]; keep; keep = !keep)
+
 int main(void) {
     // const char *dirPath = ".";
     char **markdowns = calloc(MAX_MD, sizeof(char *));
@@ -15,20 +23,24 @@ int main(void) {
         exit(1);
     }
 
-    int i = 0;
+    int total_md = 0;
     // MD_PARSER *p = malloc(sizeof(MD_PARSER *));
     Settings *settings = malloc(sizeof(Settings));
     settings_parse(settings);
     //
-    find_markdown_files(settings->workdir, &markdowns, &i);
+    find_markdown_files(settings->workdir, &markdowns, &total_md);
     // find_markdown_files(".", &markdowns, &i);
 
-    for (int j = 0; j < i; j++) {
-        printf("md: %s\n", markdowns[j]);
-        // char *t = "*some text*";
-        // int res = md_parse(t, strlen(t) + 1, p, v);
-        // printf("%i\n", res);
+    for_in(char *m, markdowns, total_md) {
+        printf("markdown: %s\n", m);
     }
+
+    // for (int j = 0; j < i; j++) {
+    // printf("md: %s\n", markdowns[j]);
+    // char *t = "*some text*";
+    // int res = md_parse(t, strlen(t) + 1, p, v);
+    // printf("%i\n", res);
+    // }
 
     // TODO @next check the process in ocaml and rewrite it in C
 
