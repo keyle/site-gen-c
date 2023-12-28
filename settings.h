@@ -12,6 +12,6 @@ typedef struct {
     char* keywords_tag;
 } Settings;
 
-void unmarshal_settings(Settings* settings);
+void settings_parse(Settings* settings);
 
 #endif

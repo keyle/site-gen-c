@@ -18,7 +18,7 @@ int main(void) {
     int i = 0;
     // MD_PARSER *p = malloc(sizeof(MD_PARSER *));
     Settings *settings = malloc(sizeof(Settings));
-    unmarshal_settings(settings);
+    settings_parse(settings);
     //
     find_markdown_files(settings->workdir, &markdowns, &i);
     // find_markdown_files(".", &markdowns, &i);

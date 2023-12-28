@@ -4,7 +4,7 @@
 #include <strings.h>
 #include <time.h>
 
-char* read_file_content(const char* filename) {
+char* read_file_content(const char filename[static 1]) {
     FILE* fp = fopen(filename, "r");
     if (!fp) {
         fprintf(stderr, "Failed to open file: %s\n", filename);
@@ -37,14 +37,14 @@ char* read_file_content(const char* filename) {
     return content;
 }
 
-bool str_contains(const char* contents, const char* needle) {
+bool str_contains(const char contents[static 1], const char needle[static 1]) {
     if (strstr(contents, needle) != NULL) {
         return true;
     }
     return false;
 }
 
-void str_replace(char* content, const char* from, const char* to) {
+void str_replace(char content[static 1], const char from[static 1], const char to[static 1]) {
     int from_len = strlen(from);
     int to_len = strlen(to);
 
@@ -67,7 +67,7 @@ void str_replace(char* content, const char* from, const char* to) {
     free(result);
 }
 
-char* str_content_between(char* contents, const char* start, const char* end) {
+char* str_content_between(char* contents, const char start[static 1], const char end[static 1]) {
     char* start_pos = strstr(contents, start);
     if (start_pos == NULL) {
         return NULL;

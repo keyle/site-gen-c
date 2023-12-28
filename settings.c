@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <strings.h>
 
-void unmarshal_settings(Settings settings[static 1]) {
+void settings_parse(Settings settings[static 1]) {
     char *settings_json = read_file_content("/Users/n/.config/site-gen/settings.json");
 
     cJSON *root = cJSON_Parse(settings_json);
