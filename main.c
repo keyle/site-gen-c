@@ -34,6 +34,8 @@ int main(void) {
 
     // markdown_html("# Hello, Newb!\n\nThis is a simple test. <x-title>this was already a title</x-title>");
     free(settings);
+    free(markdowns);
+    debug_mem();
     return 0;
 }
 

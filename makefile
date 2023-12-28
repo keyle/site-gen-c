@@ -1,7 +1,7 @@
 COMPILER = clang
 APP = site-gen-c
 SOURCE_LIBS = -Ilibs/ -Llibs/
-WARNINGS = -Wall -Wextra -pedantic
+WARNINGS = -Wall -Wextra
 DEBUG_BUILD = -ggdb -v -std=c2x
 LEAKS_BUILD  = -fsanitize=address
 RELEASE_FLAGS = -std=c2x -O3
