@@ -13,29 +13,28 @@ LIB_CFILES = $(wildcard libs/*.c)
 OBJ = $(patsubst %.c, %.o, $(CFILES)) $(patsubst libs/%.c, libs/%.o, $(LIB_CFILES))
 
 export ASAN_OPTIONS := allocator_may_return_null=1
-
 # Rule for compiling library .c files into .o files
 libs/%.o: libs/%.c
 	$(COMPILER) $(OBJ_FLAGS)  -c $< -o $@
 
 
-$(APP): OBJ_FLAGS = -O3 # set those flags on the libs included, we
+$(APP): OBJ_FLAGS = -O2 # set those flags on the libs included, we
+$(APP): DEBUG:=1
 $(APP): $(OBJ)
 	$(COMPILER) $^ -o $@ $(SOURCE_LIBS) $(DEBUG_BUILD) $(WARNINGS)
 	echo "\n"
 	./$(APP)
-
-
 
 #leaks: OBJ_FLAGS = -ggdb
 leaks: export ASAN_OPTIONS := allocator_may_return_null=1 # for debug -fsanitize=address
 leaks: $(OBJ)
 	$(COMPILER) $^ -o $(APP)-$@ $(SOURCE_LIBS) $(DEBUG_BUILD) $(WARNINGS) $(LEAKS_BUILD)
 
-clean:
-	rm -rf $(APP).* $(APP)* **/*.o *.o
 
 # NOTE: make clean first
 release: OBJ_FLAGS = -O3
 release: $(OBJ)
 	$(COMPILER) $^ -o $(APP)-$@ $(RELEASE_FLAGS) $(SOURCE_LIBS)
+
+clean:
+	rm -rf $(APP).* $(APP)* **/*.o *.o

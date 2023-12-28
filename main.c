@@ -1,12 +1,20 @@
+#include "mem.h"
 #include "settings.h"
 #include "md.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <strings.h>
 
+#define MAX_MD 200
+
 int main(void) {
     // const char *dirPath = ".";
-    char **markdowns = calloc(200, sizeof(char *));
+    char **markdowns = calloc(MAX_MD, sizeof(char *));
+    if (markdowns == NULL) {
+        printf("could not allocate memory");
+        exit(1);
+    }
+
     int i = 0;
     // MD_PARSER *p = malloc(sizeof(MD_PARSER *));
     Settings *settings = malloc(sizeof(Settings));
@@ -25,7 +33,7 @@ int main(void) {
     // TODO @next check the process in ocaml and rewrite it in C
 
     // markdown_html("# Hello, Newb!\n\nThis is a simple test. <x-title>this was already a title</x-title>");
-
+    free(settings);
     return 0;
 }
 
