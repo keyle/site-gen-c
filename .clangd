@@ -1,4 +1,4 @@
 CompileFlags:
 	Remove: [-pedantic]
-	Add: [-Wunused-parameter, -fpermissive]
+	Add: [-Wunused-parameter, -fpermissive, -std=c2x]
 	

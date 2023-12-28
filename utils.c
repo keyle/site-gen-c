@@ -45,8 +45,8 @@ bool str_contains(const char contents[static 1], const char needle[static 1]) {
 }
 
 void str_replace(char content[static 1], const char from[static 1], const char to[static 1]) {
-    int from_len = strlen(from);
-    int to_len = strlen(to);
+    size_t from_len = strlen(from);
+    size_t to_len = strlen(to);
 
     char* result = malloc(strlen(content) + 1); // Dynamic allocation for the result
     char* current_pos = content;
@@ -78,7 +78,7 @@ char* str_content_between(char* contents, const char start[static 1], const char
         return NULL;
     }
 
-    int length = end_pos - (start_pos + strlen(start));
+    size_t length = end_pos - (start_pos + strlen(start));
     char* result = (char*)malloc(length + 1);
     strncpy(result, start_pos + strlen(start), length);
     result[length] = '\0';
@@ -92,6 +92,10 @@ char* now_date() {
     time(&current_time);
     current_tm = localtime(&current_time);
     char* date_time = malloc(30 * sizeof(char));
+    if (!date_time) {
+        fprintf(stderr, "could not allocate in now_date()");
+        return NULL;
+    }
     strftime(date_time, 30, "%Y-%m-%d %H:%M", current_tm);
     return date_time;
 }

@@ -29,16 +29,16 @@ void _debug_grow_if_needed() {
     meminfo_sz = new_size;
 }
 
-void _debug_add(char* file, size_t line, size_t size, void* p) {
-    _debug_grow_if_needed();
+void _debug_add(char file[static 1], size_t line, size_t size, void* p) {
     Meminfo* new_meminfo = malloc(sizeof(Meminfo));
-    if (new_meminfo) {
-        *new_meminfo = (Meminfo){.size = size, .line = line, .p = p, .file = file};
-        meminfos[meminfo_i++] = new_meminfo;
-    } else {
+    if (!new_meminfo) {
         fprintf(stderr, "Failed to allocate Meminfo\n");
         exit(1);
     }
+    *new_meminfo = (Meminfo){.size = size, .line = line, .p = p, .file = file};
+
+    _debug_grow_if_needed();
+    meminfos[meminfo_i++] = new_meminfo;
 }
 
 void _debug_remove(void* p) {
