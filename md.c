@@ -4,7 +4,7 @@
 #include <dirent.h>
 #include <string.h>
 
-void find_markdown_files(const char *dirPath, char ***markdowns, int *i) {
+void find_markdown_files(const char dirPath[static 1], char **markdowns[], int *i) {
     DIR *dir;
     struct dirent *entry;
 

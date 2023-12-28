@@ -4,7 +4,7 @@
 typedef struct {
     char* workdir;
     char* webroot;
-    char* template_post;
+    char* template_article;
     char* template_index;
     char* content_tag;
     char* title_tag;
