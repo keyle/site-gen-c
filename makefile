@@ -2,28 +2,29 @@ COMPILER = clang
 APP = site-gen-c
 SOURCE_LIBS = -Ilibs/ -Llibs/
 WARNINGS = -Wall -Wextra
-DEBUG_BUILD = -ggdb -v -std=c2x
+DEBUG_BUILD = -g -v -std=c2x
 LEAKS_BUILD  = -fsanitize=address
 RELEASE_FLAGS = -std=c2x -O3
 CFILES = $(wildcard *.c)
 # Discover all .c files in the libs directory
 LIB_CFILES = $(wildcard libs/*.c)
+OBJ_FLAGS = -g 
+export ASAN_OPTIONS := allocator_may_return_null=1
 
 # Create object files list from CFILES and LIB_CFILES
 OBJ = $(patsubst %.c, %.o, $(CFILES)) $(patsubst libs/%.c, libs/%.o, $(LIB_CFILES))
 
-export ASAN_OPTIONS := allocator_may_return_null=1
+# Rule for compiling .c files into .o files
+%.o: %.c
+	$(COMPILER) $(OBJ_FLAGS) -c $< -o $@
+
+# TODO this needs to be cleaned up as obj_flags are applied to all builds
 # Rule for compiling library .c files into .o files
 libs/%.o: libs/%.c
-	$(COMPILER) $(OBJ_FLAGS)  -c $< -o $@
+	$(COMPILER) $(OBJ_FLAGS) -c $< -o $@
 
-
-$(APP): OBJ_FLAGS = -O2 # set those flags on the libs included, we
-$(APP): DEBUG:=1
 $(APP): $(OBJ)
 	$(COMPILER) $^ -o $@ $(SOURCE_LIBS) $(DEBUG_BUILD) $(WARNINGS)
-	echo "\n"
-	./$(APP)
 
 #leaks: OBJ_FLAGS = -ggdb
 leaks: export ASAN_OPTIONS := allocator_may_return_null=1 # for debug -fsanitize=address
