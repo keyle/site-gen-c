@@ -1,4 +1,4 @@
-#include "mem_.h"
+// #include "mem.h"
 #include "settings.h"
 #include "md.h"
 #include "article.h"
@@ -33,12 +33,12 @@ int main(void) {
     find_markdown_files(settings->workdir, &markdowns, &total_md);
     // find_markdown_files(".", &markdowns, &i);
 
-    // for_in(char *m, markdowns, total_md) {
-    //     Article *article = malloc(sizeof(Article));
-    //     *article = (Article){0};
-    //     printf("markdown: %s\n", m);
-    //     process(settings, article, m);
-    // }
+    for_in(char *m, markdowns, total_md) {
+        Article *article = malloc(sizeof(Article));
+        *article = (Article){0};
+        printf("markdown: %s\n", m);
+        process(settings, article, m);
+    }
 
     // for (int j = 0; j < i; j++) {
     // printf("md: %s\n", markdowns[j]);
@@ -52,7 +52,7 @@ int main(void) {
     // markdown_html("# Hello, Newb!\n\nThis is a simple test. <x-title>this was already a title</x-title>");
     free(settings);
     free(markdowns);
-    debug_mem();
+    // debug_mem();
     return 0;
 }
 

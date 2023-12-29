@@ -18,7 +18,6 @@ char* read_file_content(const char filename[static 1]) {
 
     // Allocate memory for the file content
     char* content = (char*)malloc(file_size);
-    printf("malloc\n");
     if (!content) {
         fprintf(stderr, "Failed to allocate memory.\n");
         fclose(fp);
@@ -45,27 +44,37 @@ bool str_contains(const char contents[static 1], const char needle[static 1]) {
     return false;
 }
 
-void str_replace(char content[static 1], const char from[static 1], const char to[static 1]) {
+char* str_replace(const char content[static 1], const char from[static 1], const char to[static 1]) {
+    size_t content_len = strlen(content);
     size_t from_len = strlen(from);
     size_t to_len = strlen(to);
 
-    char* result = malloc(strlen(content) + 1); // Dynamic allocation for the result
-    char* current_pos = content;
-    char* temp = result;
+    // Calculate the length of the result string
+    size_t result_len = content_len;
+    for (const char* p = content; (p = strstr(p, from)) != NULL; p += from_len) {
+        result_len += (to_len - from_len);
+    }
 
-    while (*current_pos) {
-        if (strstr(current_pos, from) == current_pos) { // Match found
-            strcpy(temp, to);
-            current_pos += from_len;
+    // Allocate memory for the result
+    char* result = malloc(result_len + 1);
+    if (!result) {
+        fprintf(stderr, "Failed to allocate memory.\n");
+        return NULL;
+    }
+
+    char* temp = result;
+    while (*content) {
+        if (strstr(content, from) == content) {
+            memcpy(temp, to, to_len);
+            content += from_len;
             temp += to_len;
         } else {
-            *temp++ = *current_pos++;
+            *temp++ = *content++;
         }
     }
 
     *temp = '\0';
-    strcpy(content, result);
-    free(result);
+    return result;
 }
 
 char* str_content_between(char* contents, const char start[static 1], const char end[static 1]) {
@@ -85,6 +94,42 @@ char* str_content_between(char* contents, const char start[static 1], const char
     result[length] = '\0';
 
     return result;
+}
+
+char* str_last(const char str[static 1], char split) {
+    const char* last_occurrence = strrchr(str, split);
+
+    if (last_occurrence == NULL) {
+        // The split character isn't found in the string.
+        // You can either return NULL or a copy of the original string.
+        return NULL;
+    }
+
+    last_occurrence++;
+
+    char* result = malloc(strlen(last_occurrence) + 1);
+    if (result == NULL) {
+        fprintf(stderr, "Failed to allocate memory in str_last().\n");
+        return NULL;
+    }
+
+    strcpy(result, last_occurrence);
+    return result;
+}
+
+bool str_append(char* original[static 1], const char text_to_append[static 1]) {
+    size_t original_len = *original ? strlen(*original) : 0;
+    size_t append_len = strlen(text_to_append);
+
+    char* new_str = realloc(*original, original_len + (append_len * 2) + 1);
+    if (!new_str) {
+        fprintf(stderr, "Could not allocate in append()");
+        return false;
+    }
+
+    strcpy(new_str + original_len, text_to_append);
+    *original = new_str;
+    return true;
 }
 
 char* now_date() {

@@ -24,7 +24,7 @@ void* _debug_calloc(size_t count, size_t size, char file[static 1], size_t line)
 }
 
 void* _debug_realloc(void* p, size_t size, char file[static 1], size_t line) {
-    printf("\033[33m* remalloc %s:%zu (%zu bytes) at %p\033[0m\n", file, line, size, p);
+    printf("\033[33m* realloc %s:%zu (%zu bytes) at %p\033[0m\n", file, line, size, p);
     _debug_add(file, line, size, p);
     return realloc(p, size);
 }
