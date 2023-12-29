@@ -8,7 +8,7 @@
 char* read_file_content(const char filename[static 1]) {
     FILE* fp = fopen(filename, "r");
     if (!fp) {
-        fprintf(stderr, "Failed to open file: %s\n", filename);
+        fprintf(stderr, "Failed to open file: %s in read_file_content()\n", filename);
         return 0;
     }
 
@@ -20,7 +20,7 @@ char* read_file_content(const char filename[static 1]) {
     // Allocate memory for the file content
     char* content = (char*)malloc(file_size);
     if (!content) {
-        fprintf(stderr, "Failed to allocate memory.\n");
+        fprintf(stderr, "Failed to allocate memory in read_file_content()\n");
         fclose(fp);
         return 0;
     }
@@ -28,7 +28,7 @@ char* read_file_content(const char filename[static 1]) {
     // Read the file content
     size_t bytes_read = fread(content, 1, file_size, fp);
     if (bytes_read != file_size) {
-        fprintf(stderr, "Failed to read the entire file.\n");
+        fprintf(stderr, "Failed to read the entire file in read_file_content()\n");
         free(content);
         fclose(fp);
         return 0;
@@ -39,10 +39,7 @@ char* read_file_content(const char filename[static 1]) {
 }
 
 bool str_contains(const char contents[static 1], const char needle[static 1]) {
-    if (strstr(contents, needle) != NULL) {
-        return true;
-    }
-    return false;
+    return (strstr(contents, needle) != NULL);
 }
 
 char* str_replace(const char content[static 1], const char from[static 1], const char to[static 1]) {
@@ -59,7 +56,7 @@ char* str_replace(const char content[static 1], const char from[static 1], const
     // Allocate memory for the result
     char* result = malloc(result_len + 1);
     if (!result) {
-        fprintf(stderr, "Failed to allocate memory.\n");
+        fprintf(stderr, "Failed to allocate memory in str_replace()\n");
         return NULL;
     }
 
@@ -124,13 +121,29 @@ bool str_append(char* original[static 1], const char text_to_append[static 1]) {
 
     char* new_str = realloc(*original, original_len + (append_len * 2) + 1);
     if (!new_str) {
-        fprintf(stderr, "Could not allocate in append()");
+        fprintf(stderr, "Could not allocate in str_append()");
         return false;
     }
 
     strcpy(new_str + original_len, text_to_append);
     *original = new_str;
     return true;
+}
+
+char* str_concat(const char original[static 1], const char text_to_append[static 1]) {
+    size_t original_len = strlen(original);
+    size_t append_len = strlen(text_to_append);
+
+    char* new_str = malloc(original_len + append_len + 1);
+    if (!new_str) {
+        fprintf(stderr, "Could not allocate in str_concat()\n");
+        return NULL;
+    }
+
+    strcpy(new_str, original);
+    strcat(new_str, text_to_append);
+
+    return new_str;
 }
 
 char* str_trim(const char input[static 1]) {
@@ -231,6 +244,6 @@ char* now_date() {
         fprintf(stderr, "could not allocate in now_date()");
         return NULL;
     }
-    strftime(date_time, 30, "%Y-%m-%d %H:%M", current_tm);
+    strftime(date_time, 30, "%Y-%m-%d", current_tm); // %H:%M
     return date_time;
 }
