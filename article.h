@@ -13,9 +13,7 @@ typedef struct {
     bool is_blog;
     char* pub_date;
     char* description;
-    char** tags;
-    size_t html_len;
-    size_t html_capacity;
+    char* tags;
 } Article;
 
 #endif

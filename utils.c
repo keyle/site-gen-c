@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <ctype.h>
 #include <time.h>
 
 char* read_file_content(const char filename[static 1]) {
@@ -130,6 +131,94 @@ bool str_append(char* original[static 1], const char text_to_append[static 1]) {
     strcpy(new_str + original_len, text_to_append);
     *original = new_str;
     return true;
+}
+
+char* str_trim(const char input[static 1]) {
+    const char* start = input;
+    while (*start && isspace((unsigned char)*start)) {
+        start++;
+    }
+
+    if (*start == '\0') {
+        // The string is all whitespace
+        return strdup("");
+    }
+
+    const char* end = input + strlen(input) - 1;
+    while (end > start && (isspace((unsigned char)*end) || *end == '\r' || *end == '\n')) {
+        end--;
+    }
+
+    size_t length = end - start + 1;
+    char* trimmed = malloc(length + 1);
+    if (!trimmed) {
+        fprintf(stderr, "could not allocate in str_trim()");
+        return NULL;
+    }
+
+    strncpy(trimmed, start, length);
+    trimmed[length] = '\0'; // Null-terminate the string
+
+    return trimmed;
+}
+
+char** str_split(const char input[static 1], const char delimiter) {
+    // Count how many elements will be extracted.
+    size_t count = 0;
+    const char* temp = input;
+    while (*temp) {
+        if (*temp == delimiter) {
+            count++;
+        }
+        temp++;
+    }
+
+    // Allocate memory for result array of strings
+    // +1 for the final NULL pointer and +1 for last string not followed by delimiter
+    char** result = malloc((count + 2) * sizeof(char*));
+    if (!result) {
+        fprintf(stderr, "Could not allocate in str_split()");
+        return NULL;
+    }
+
+    size_t index = 0;
+    const char* start = input;
+    for (const char* it = input;; it++) {
+        if (*it == delimiter || *it == '\0') {
+            size_t length = it - start;
+            result[index] = malloc(length + 1); // +1 for null terminator
+            if (!result[index]) {
+                // Handle allocation failure: free previously allocated memory
+                while (index > 0) {
+                    free(result[--index]);
+                }
+                free(result);
+                return NULL;
+            }
+            memcpy(result[index], start, length);
+            result[index][length] = '\0'; // Null terminate the string
+            index++;
+
+            if (*it == '\0') {
+                break;
+            }
+            start = it + 1;
+        }
+    }
+    result[index] = NULL; // Mark the end of the array
+
+    return result;
+}
+
+// Function to free the memory allocated by str_split
+void free_str_split(char* str_array[static 1]) {
+    if (str_array == NULL) {
+        return;
+    }
+    for (char** p = str_array; *p; p++) {
+        free(*p);
+    }
+    free(str_array);
 }
 
 char* now_date() {

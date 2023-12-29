@@ -38,7 +38,7 @@ void process_output(const MD_CHAR output[static 1], MD_SIZE size, void* userdata
 }
 
 void process(Settings settings[static 1], Article article[static 1], const char markdownPath[static 1]) {
-    const char* markdown = read_file_content(markdownPath);
+    const char* markdown = str_trim(read_file_content(markdownPath));
     article->markdown = strdup(markdown);
     article->path = strdup(markdownPath);
     article->file = str_last(markdownPath, '/');
@@ -67,9 +67,15 @@ void process(Settings settings[static 1], Article article[static 1], const char 
 
     const char* tag1 = article->is_blog ? "<x-blog-title>" : "<x-title>";
     const char* tag2 = article->is_blog ? "</x-blog-title>" : "</x-title>";
-    char* title = str_content_between(article->markdown, tag1, tag2);
-    article->title = strdup(title);
+
+    article->title = str_content_between(article->markdown, tag1, tag2);
     printf("set title from markdown in struct\n");
+
+    article->description = str_content_between(article->markdown, "<x-desc>", "</x-desc");
+    printf("set description from markdown in struct\n");
+
+    article->tags = str_content_between(article->markdown, "<x-tags>", "</x-tags");
+    printf("set tags from markdown in struct\n");
 
     char* template_w_title = str_replace(template_w_content, settings->title_tag, article->title);
     printf("replaced title in html\n");
@@ -80,11 +86,14 @@ void process(Settings settings[static 1], Article article[static 1], const char 
         article->pub_date = str_content_between(article->markdown, "<sub>", "</sub>");
         printf("set pudate from sub\n");
     } else {
-        article->pub_date = strdup(now_date());
+        article->pub_date = now_date();
         template_w_bodyclass = template_w_title;
         printf("set pudate from now\n");
     }
 
-    article->html = strdup(template_w_bodyclass);
+    char* template_w_description = str_replace(template_w_bodyclass, settings->description_tag, article->description);
+    char* template_w_keywords = str_replace(template_w_description, settings->keywords_tag, article->tags);
+
+    article->html = template_w_keywords;
     printf("copied html over\n");
 }

@@ -38,6 +38,7 @@ int main(void) {
         *article = (Article){0};
         printf("markdown: %s\n", m);
         process(settings, article, m);
+        printf("processed article\n");
     }
 
     // for (int j = 0; j < i; j++) {
