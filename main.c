@@ -1,6 +1,8 @@
-#include "mem.h"
+#include "mem_.h"
 #include "settings.h"
 #include "md.h"
+#include "article.h"
+#include "sitegen.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <strings.h>
@@ -31,9 +33,12 @@ int main(void) {
     find_markdown_files(settings->workdir, &markdowns, &total_md);
     // find_markdown_files(".", &markdowns, &i);
 
-    for_in(char *m, markdowns, total_md) {
-        printf("markdown: %s\n", m);
-    }
+    // for_in(char *m, markdowns, total_md) {
+    //     Article *article = malloc(sizeof(Article));
+    //     *article = (Article){0};
+    //     printf("markdown: %s\n", m);
+    //     process(settings, article, m);
+    // }
 
     // for (int j = 0; j < i; j++) {
     // printf("md: %s\n", markdowns[j]);

@@ -18,6 +18,7 @@ char* read_file_content(const char filename[static 1]) {
 
     // Allocate memory for the file content
     char* content = (char*)malloc(file_size);
+    printf("malloc\n");
     if (!content) {
         fprintf(stderr, "Failed to allocate memory.\n");
         fclose(fp);
