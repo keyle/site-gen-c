@@ -4,7 +4,6 @@
 #include <strings.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 
 typedef struct str {
     size_t len;
