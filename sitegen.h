@@ -4,6 +4,7 @@
 #include "settings.h"
 #include "article.h"
 
-void process(Settings* settings, Article* article, const char* path);
+void process(Settings*, Article*, const char* markdown_path);
+void write(Article*);
 
 #endif

@@ -5,38 +5,6 @@
 #include <ctype.h>
 #include <time.h>
 
-char* read_file_content(const char filename[static 1]) {
-    FILE* fp = fopen(filename, "r");
-    if (!fp) {
-        fprintf(stderr, "Failed to open file: %s in read_file_content()\n", filename);
-        return 0;
-    }
-
-    // Get the file size
-    fseek(fp, 0, SEEK_END);
-    size_t file_size = ftell(fp);
-    rewind(fp);
-
-    // Allocate memory for the file content
-    char* content = (char*)malloc(file_size);
-    if (!content) {
-        fprintf(stderr, "Failed to allocate memory in read_file_content()\n");
-        fclose(fp);
-        return 0;
-    }
-
-    // Read the file content
-    size_t bytes_read = fread(content, 1, file_size, fp);
-    if (bytes_read != file_size) {
-        fprintf(stderr, "Failed to read the entire file in read_file_content()\n");
-        free(content);
-        fclose(fp);
-        return 0;
-    }
-
-    fclose(fp);
-    return content;
-}
 
 bool str_contains(const char contents[static 1], const char needle[static 1]) {
     return (strstr(contents, needle) != NULL);
