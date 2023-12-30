@@ -23,7 +23,7 @@ void md_parse_progress(const MD_CHAR output[static 1], MD_SIZE size, void* userd
     str* s = userdata;
 
     if (s->len + size > s->cap) {
-        size_t new_cap = s->len + size; // +1
+        size_t new_cap = s->len + size + 1;
         char* new_buffer = realloc(s->str, new_cap);
         if (!new_buffer) {
             fprintf(stderr, "could not increase html buffer");
@@ -67,6 +67,7 @@ void process(Settings settings[static 1], Article article[static 1], const char 
     }
 
     article->title = str_content_between(article->markdown, tag1, tag2);
+
     if (!article->title) {
         fprintf(stderr, "could not find <x-title> for %s\n", article->path);
         exit(1);
@@ -104,7 +105,6 @@ void process(Settings settings[static 1], Article article[static 1], const char 
     char* template_w_content = str_replace(template.data, settings->content_tag, raw_html->str);
     char* template_w_title = str_replace(template_w_content, settings->title_tag, article->title);
     char* template_w_bodyclass;
-
     if (article->is_blog) {
         template_w_bodyclass = str_replace(template_w_title, "<body>", "<body class='blog'>");
         article->pub_date = str_content_between(article->markdown, "<sub>", "</sub>");
