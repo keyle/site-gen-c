@@ -27,7 +27,6 @@ void files_find_md(const char dir_path[static 1], char **list, int count[static 
             strcat(md, entry->d_name);
             if (*count == *capacity) {
                 (*capacity) *= 2;
-                printf("grow %d, %d \n", *count, *capacity);
                 list = realloc(list, sizeof(char *) * (*capacity));
             }
             list[(*count)++] = md;

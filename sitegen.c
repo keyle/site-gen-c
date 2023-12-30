@@ -7,38 +7,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct str {
-    size_t len;
-    size_t cap;
-    char* str;
-} str;
-
 void md_parse_progress(const MD_CHAR output[static 1], MD_SIZE size, void* userdata) {
     // fwrite(output, size, 1, stdout); // For example, write to stdout
     if (!userdata) {
         fprintf(stderr, "could not pass user data in process_output");
         exit(1);
     }
-
     str* s = userdata;
-
-    if (s->len + size > s->cap) {
-        size_t new_cap = s->len + size + 1;
-        char* new_buffer = realloc(s->str, new_cap);
-        if (!new_buffer) {
-            fprintf(stderr, "could not increase html buffer");
-            exit(1);
-        }
-        s->str = new_buffer;
-        s->cap = new_cap;
-    }
-
-    memcpy(s->str + s->len, output, size);
-    s->len += size;
-    s->str[s->len] = '\0';
+    printf("output_len vs. size %zu vs. %d\n", strlen(output), size);
+    str_append(s, output, size);
+    // TODO fixme we're somehow still outputting garbage at the end of the file, see index.html
 }
 
-void process(Settings settings[static 1], Article article[static 1], const char markdown_path[static 1]) {
+void process(Settings settings[static 1], Article article[static 1], const char markdown_path[static 1], char template_index[static 1], char template_article[static 1]) {
     const file_t loaded = read_file_content(markdown_path);
     if (loaded.error) {
         fprintf(stderr, "Could not read file %s, aborting.\n", markdown_path);
@@ -87,22 +68,10 @@ void process(Settings settings[static 1], Article article[static 1], const char 
     // or in this case, we take the web root, and we append what's between the workdir and the filename,
     // that's the vanity url
     char* vanity_url = strdup(settings->webroot);
-    bool res = str_append(&vanity_url, str_content_between(article->path, settings->workdir, article->file));
-    if (!res) {
-        fprintf(stderr, "str_append: could not write vanity url");
-    }
+    article->url = str_concat(vanity_url, str_content_between(article->path, settings->workdir, article->file));
 
-    const file_t template =
-        str_contains(markdown, "<x-index/>")
-            ? read_file_content(settings->template_index)
-            : read_file_content(settings->template_article);
-
-    if (template.error) {
-        fprintf(stderr, "could not load template, aborting");
-        exit(1);
-    }
-
-    char* template_w_content = str_replace(template.data, settings->content_tag, raw_html->str);
+    char* template = str_contains(markdown, "<x-index/>") ? template_index : template_article;
+    char* template_w_content = str_replace(template, settings->content_tag, raw_html->str);
     char* template_w_title = str_replace(template_w_content, settings->title_tag, article->title);
     char* template_w_bodyclass;
     if (article->is_blog) {
@@ -144,6 +113,26 @@ void blog_index(Settings settings[static 1], Article* article_list[static 1], si
         fprintf(stderr, "could not load template, aborting\n");
         exit(1);
     }
+    return;
 
     sort_articles_date_descending(article_list, article_count);
+    str* table = &(str){0};
+    str_append(table, "<table>", 7);
+
+    for (size_t i = 0; i < article_count; i++) {
+        Article* article = article_list[i];
+        if (!article->is_blog)
+            continue;
+        char to_add[1000];
+        const char* date = article_format_date(article->pub_date);
+        sprintf(to_add, "<tr><td>%s</td><td><a href='%s'>%s</a></td><td>&nbsp;</td>", date, article->url, article->title);
+        str_append(table, to_add, strlen(to_add));
+    }
+    str_append(table, "</table>", 8);
+    // printf("---\n%s\n%zu/%zu\n", table->str, table->len, table->cap);
+    char* new_html = str_replace(template.data, "<x-blog-index/>", table->str);
+    write_file_content(template_loc, new_html);
+    free(new_html);
+    str_free(table);
+    free(template_loc);
 }

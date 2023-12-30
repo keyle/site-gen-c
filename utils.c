@@ -50,20 +50,20 @@ char *str_last(const char str[static 1], char split) {
     return result;
 }
 
-bool str_append(char *original[static 1], const char text_to_append[static 1]) {
-    size_t original_len = *original ? strlen(*original) : 0;
-    size_t append_len = strlen(text_to_append);
+// bool str_append(char *original[static 1], const char text_to_append[static 1]) {
+//     size_t original_len = *original ? strlen(*original) : 0;
+//     size_t append_len = strlen(text_to_append);
 
-    char *new_str = realloc(*original, original_len + (append_len * 2) + 1);
-    if (!new_str) {
-        fprintf(stderr, "Could not allocate in str_append()");
-        return false;
-    }
+//     char *new_str = realloc(*original, original_len + (append_len * 2) + 1);
+//     if (!new_str) {
+//         fprintf(stderr, "Could not allocate in str_append()");
+//         return false;
+//     }
 
-    strcpy(new_str + original_len, text_to_append);
-    *original = new_str;
-    return true;
-}
+//     strcpy(new_str + original_len, text_to_append);
+//     *original = new_str;
+//     return true;
+// }
 
 char *str_concat(const char original[static 1], const char text_to_append[static 1]) {
     size_t original_len = strlen(original);
@@ -218,4 +218,28 @@ char *str_replace(char *src, const char *find, const char *replace) {
         q += len_replace;
         s = t + len_find;
     }
+}
+
+void str_append(str *s, const char *text_to_append, size_t size) {
+    if (s->len + size > s->cap) {
+        size_t new_cap = s->len + size;
+        char *new_buffer = realloc(s->str, new_cap);
+        if (!new_buffer) {
+            fprintf(stderr, "could not increase buffer in str_append() for %s\n", text_to_append);
+            exit(1);
+        }
+        s->str = new_buffer;
+        s->cap = new_cap;
+    }
+
+    memcpy(s->str + s->len, text_to_append, size);
+    s->len += size;
+    s->str[s->len] = '\0';
+}
+
+void str_free(str *s) {
+    free(s->str);
+    s->str = NULL;
+    s->len = 0;
+    s->cap = 0;
 }

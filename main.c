@@ -1,5 +1,6 @@
 #include "settings.h"
 #include "md.h"
+#include "files.h"
 #include "article.h"
 #include "sitegen.h"
 #include <stdlib.h>
@@ -14,19 +15,19 @@ int main(void) {
     int count = 0;
 
     if (!settings) {
-        fprintf(stderr, "could not allocate memory for settings");
+        fprintf(stderr, "could not allocate memory for settings\n");
         exit(1);
     }
 
     char **list = malloc(sizeof(char *) * capacity);
     if (!list) {
-        fprintf(stderr, "could not allocate memory for list");
+        fprintf(stderr, "could not allocate memory for list\n");
         exit(1);
     }
 
     settings_parse(settings);
     if (settings->workdir == NULL) {
-        fprintf(stderr, "could not find workdir");
+        fprintf(stderr, "could not find workdir\n");
         exit(1);
     }
 
@@ -36,14 +37,26 @@ int main(void) {
 
     Article **article_list = malloc(sizeof(Article *) * count);
     if (article_list == NULL) {
-        printf("could not allocate memory for articles");
+        printf("could not allocate memory for articles\n");
+        exit(1);
+    }
+
+    file_t template_index = read_file_content(settings->template_index);
+    if (template_index.error) {
+        fprintf(stderr, "could not read template index\n");
+        exit(1);
+    }
+
+    file_t template_article = read_file_content(settings->template_article);
+    if (template_article.error) {
+        fprintf(stderr, "could not read template article\n");
         exit(1);
     }
 
     for (int i = 0; i < count; i++) {
         char *md_file = list[i];
         Article *article = malloc(sizeof(Article));
-        process(settings, article, md_file);
+        process(settings, article, md_file, template_index.data, template_article.data);
         write_html(article);
         article_list[i] = article;
     }
