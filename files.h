@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 typedef struct file_t {
-    const char* data;
+    char* data;
     size_t size;
     bool error;
 } file_t;
