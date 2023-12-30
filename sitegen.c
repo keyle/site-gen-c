@@ -110,6 +110,8 @@ void write(Article article[static 1]) {
         fprintf(stderr, "Could not write HTML file, aborting.\n");
         exit(1);
     } else {
+        // TODO one of the files had garbage at the bottom, might be a problem there
+        //      potentially related to UTF-8 in the string?
         printf("%s: wrote %zu bytes\n", target, strlen(article->html));
     }
 }
