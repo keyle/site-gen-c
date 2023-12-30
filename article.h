@@ -16,4 +16,6 @@ typedef struct {
     char* tags;
 } Article;
 
+void sort_articles_date_descending(Article** article_list, size_t article_count);
+
 #endif

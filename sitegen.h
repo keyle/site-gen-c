@@ -5,6 +5,7 @@
 #include "article.h"
 
 void process(Settings*, Article*, const char* markdown_path);
-void write(Article*);
+void write_html(Article*);
+void blog_index(Settings*, Article** article_list, size_t article_count);
 
 #endif

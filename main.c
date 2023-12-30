@@ -2,34 +2,53 @@
 #include "md.h"
 #include "article.h"
 #include "sitegen.h"
-#include "augment.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <strings.h>
 #define MAX_MD 200
 
 int main(void) {
-    char **markdown_path_list = calloc(MAX_MD, sizeof(char *));
-    int total_md = 0;
+    Settings *settings = malloc(sizeof(Settings));
+    settings = &(Settings){0};
+    int capacity = 200;
+    int count = 0;
 
-    if (markdown_path_list == NULL) {
-        printf("could not allocate memory");
+    if (!settings) {
+        fprintf(stderr, "could not allocate memory for settings");
         exit(1);
     }
 
-    Settings *settings = malloc(sizeof(Settings));
-    settings_parse(settings);
-
-    find_markdown_files(settings->workdir, &markdown_path_list, &total_md);
-
-    for_in(char *markdown, markdown_path_list, total_md) {
-        Article *article = malloc(sizeof(Article));
-        *article = (Article){0};
-        process(settings, article, markdown);
-        write(article);
+    char **list = malloc(sizeof(char *) * capacity);
+    if (!list) {
+        fprintf(stderr, "could not allocate memory for list");
+        exit(1);
     }
 
-    free(settings);
-    free(markdown_path_list);
+    settings_parse(settings);
+    if (settings->workdir == NULL) {
+        fprintf(stderr, "could not find workdir");
+        exit(1);
+    }
+
+    files_find_md(settings->workdir, list, &count, &capacity);
+
+    printf("processed %d files\n", count);
+
+    Article **article_list = malloc(sizeof(Article *) * count);
+    if (article_list == NULL) {
+        printf("could not allocate memory for articles");
+        exit(1);
+    }
+
+    for (int i = 0; i < count; i++) {
+        char *md_file = list[i];
+        Article *article = malloc(sizeof(Article));
+        process(settings, article, md_file);
+        write_html(article);
+        article_list[i] = article;
+    }
+
+    blog_index(settings, article_list, count);
+
     return 0;
 }

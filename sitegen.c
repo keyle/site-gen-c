@@ -1,4 +1,5 @@
 #include "sitegen.h"
+#include "article.h"
 #include "utils.h"
 #include "files.h"
 #include "libs/md4c-html.h"
@@ -60,10 +61,26 @@ void process(Settings settings[static 1], Article article[static 1], const char 
 
     const char* tag1 = article->is_blog ? "<x-blog-title>" : "<x-title>";
     const char* tag2 = article->is_blog ? "</x-blog-title>" : "</x-title>";
+    if (!tag1 || !tag2) {
+        fprintf(stderr, "could not find any title tags for %s\n", article->path);
+        exit(1);
+    }
 
     article->title = str_content_between(article->markdown, tag1, tag2);
+    if (!article->title) {
+        fprintf(stderr, "could not find <x-title> for %s\n", article->path);
+        exit(1);
+    }
     article->description = str_content_between(article->markdown, "<x-desc>", "</x-desc");
+    if (!article->description) {
+        fprintf(stderr, "could not find <x-desc> for %s\n", article->path);
+        exit(1);
+    }
     article->tags = str_content_between(article->markdown, "<x-tags>", "</x-tags");
+    if (!article->tags) {
+        fprintf(stderr, "could not find <x-tags> for %s\n", article->path);
+        exit(1);
+    }
 
     // vanity url = settings.webroot + (article.path - settings.workdir - article.file)
     // or in this case, we take the web root, and we append what's between the workdir and the filename,
@@ -102,7 +119,7 @@ void process(Settings settings[static 1], Article article[static 1], const char 
     article->html = template_w_keywords;
 }
 
-void write(Article article[static 1]) {
+void write_html(Article article[static 1]) {
     const char* html_path = str_replace(article->path, article->file, "");
     const char* target = str_concat(html_path, "index.html");
     result_t res = write_file_content(target, article->html);
@@ -114,4 +131,19 @@ void write(Article article[static 1]) {
         //      potentially related to UTF-8 in the string?
         printf("%s: wrote %zu bytes\n", target, strlen(article->html));
     }
+}
+
+void blog_index(Settings settings[static 1], Article* article_list[static 1], size_t article_count) {
+    char* template_loc = str_concat(settings->workdir, "/index.html");
+    if (!template_loc) {
+        fprintf(stderr, "could not allocate memory for template location in blog_index\n");
+        exit(1);
+    }
+    const file_t template = read_file_content(template_loc);
+    if (template.error) {
+        fprintf(stderr, "could not load template, aborting\n");
+        exit(1);
+    }
+
+    sort_articles_date_descending(article_list, article_count);
 }

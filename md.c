@@ -4,12 +4,12 @@
 #include <dirent.h>
 #include <string.h>
 
-void find_markdown_files(const char dirPath[static 1], char **markdowns[], int *i) {
+void files_find_md(const char dir_path[static 1], char **list, int count[static 1], int capacity[static 1]) {
     DIR *dir;
     struct dirent *entry;
 
-    if ((dir = opendir(dirPath)) == NULL) {
-        printf("Could not open directory %s\n", dirPath);
+    if ((dir = opendir(dir_path)) == NULL) {
+        printf("Could not open directory %s\n", dir_path);
         return;
     }
 
@@ -21,27 +21,30 @@ void find_markdown_files(const char dirPath[static 1], char **markdowns[], int *
             if (strcmp(ext, ".md") != 0)
                 continue;
             printf("found markdown: %s, ext: %s\n", entry->d_name, ext);
-            char *md = malloc(strlen(dirPath) + strlen(entry->d_name) + 3);
-            strcpy(md, dirPath);
+            char *md = malloc(strlen(dir_path) + strlen(entry->d_name) + 3);
+            strcpy(md, dir_path);
             strcat(md, "/");
             strcat(md, entry->d_name);
-            (*markdowns)[(*i)++] = md;
+            if (*count == *capacity) {
+                (*capacity) *= 2;
+                printf("grow %d, %d \n", *count, *capacity);
+                list = realloc(list, sizeof(char *) * (*capacity));
+            }
+            list[(*count)++] = md;
             continue;
         }
-        if (strcmp(entry->d_name, ".git") == 0)
-            continue;
-        if (strcmp(entry->d_name, ".") == 0)
+
+        if (entry->d_name[0] == '.')
             continue;
         if (strcmp(entry->d_name, "..") == 0)
             continue;
 
-        // printf("Found folder: %s\n", entry->d_name);
-
-        char *folder = malloc(strlen(dirPath) + strlen(entry->d_name) + 3);
-        strcpy(folder, dirPath);
+        char *folder = malloc(strlen(dir_path) + strlen(entry->d_name) + 3);
+        strcpy(folder, dir_path);
         strcat(folder, "/");
         strcat(folder, entry->d_name);
-        find_markdown_files(folder, markdowns, i);
+        files_find_md(folder, list, count, capacity);
     }
+
     closedir(dir);
 }

@@ -5,7 +5,6 @@
 #include <ctype.h>
 #include <time.h>
 
-
 bool str_contains(const char contents[static 1], const char needle[static 1]) {
     return (strstr(contents, needle) != NULL);
 }
