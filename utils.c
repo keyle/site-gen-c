@@ -69,15 +69,15 @@ char *str_concat(const char original[static 1], const char text_to_append[static
     size_t original_len = strlen(original);
     size_t append_len = strlen(text_to_append);
 
-    char *new_str = malloc(original_len + append_len + 1);
+    char *new_str = malloc(original_len + append_len);
     if (!new_str) {
         fprintf(stderr, "Could not allocate in str_concat()\n");
         return NULL;
     }
 
     strcpy(new_str, original);
-    strcat(new_str, text_to_append);
-    new_str[original_len + append_len + 1] = '\0';
+    strncat(new_str, text_to_append, original_len + append_len);
+    new_str[original_len + append_len] = '\0';
 
     return new_str;
 }
