@@ -125,9 +125,6 @@ void make_blog_index(Settings settings[static 1], Article* article_list[static 1
     str_append(table, "</table>", 8);
     char* new_html = str_replace(template.data, "<x-blog-index/>", table->str);
     write_file_content(template_loc, new_html);
-    free(new_html);
-    str_free(table);
-    free(template_loc);
 }
 
 void make_sitemap(Settings settings[static 1], Article* article_list[static 1], size_t article_count) {
