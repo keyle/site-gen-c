@@ -18,6 +18,7 @@ typedef struct {
 } Article;
 
 void sort_articles_date_descending(Article** article_list, size_t article_count);
-char* article_format_date(const char* input);
+char* article_format_date_web(const char* input);
+char* article_format_date_rss(const char* input);
 
 #endif

@@ -14,9 +14,7 @@ void md_parse_progress(const MD_CHAR output[static 1], MD_SIZE size, void* userd
         exit(1);
     }
     str* s = userdata;
-    printf("output_len vs. size %zu vs. %d\n", strlen(output), size);
     str_append(s, output, size);
-    // TODO fixme we're somehow still outputting garbage at the end of the file, see index.html
 }
 
 void process(Settings settings[static 1], Article article[static 1], const char markdown_path[static 1], char template_index[static 1], char template_article[static 1]) {
@@ -53,6 +51,7 @@ void process(Settings settings[static 1], Article article[static 1], const char 
         fprintf(stderr, "could not find <x-title> for %s\n", article->path);
         exit(1);
     }
+
     article->description = str_content_between(article->markdown, "<x-desc>", "</x-desc");
     if (!article->description) {
         fprintf(stderr, "could not find <x-desc> for %s\n", article->path);
@@ -71,7 +70,7 @@ void process(Settings settings[static 1], Article article[static 1], const char 
     article->url = str_concat(vanity_url, str_content_between(article->path, settings->workdir, article->file));
 
     char* template = str_contains(markdown, "<x-index/>") ? template_index : template_article;
-    char* template_w_content = str_replace(template, settings->content_tag, raw_html->str);
+    char* template_w_content = str_replace(template, settings->content_tag, str_trim(raw_html->str));
     char* template_w_title = str_replace(template_w_content, settings->title_tag, article->title);
     char* template_w_bodyclass;
     if (article->is_blog) {
@@ -95,14 +94,10 @@ void write_html(Article article[static 1]) {
     if (res.error) {
         fprintf(stderr, "Could not write HTML file, aborting.\n");
         exit(1);
-    } else {
-        // TODO one of the files had garbage at the bottom, might be a problem there
-        //      potentially related to UTF-8 in the string?
-        printf("%s: wrote %zu bytes\n", target, strlen(article->html));
     }
 }
 
-void blog_index(Settings settings[static 1], Article* article_list[static 1], size_t article_count) {
+void make_blog_index(Settings settings[static 1], Article* article_list[static 1], size_t article_count) {
     char* template_loc = str_concat(settings->workdir, "/index.html");
     if (!template_loc) {
         fprintf(stderr, "could not allocate memory for template location in blog_index\n");
@@ -113,7 +108,8 @@ void blog_index(Settings settings[static 1], Article* article_list[static 1], si
         fprintf(stderr, "could not load template, aborting\n");
         exit(1);
     }
-    return;
+
+    // printf("template:\n%s\n", template.data);
 
     sort_articles_date_descending(article_list, article_count);
     str* table = &(str){0};
@@ -124,15 +120,90 @@ void blog_index(Settings settings[static 1], Article* article_list[static 1], si
         if (!article->is_blog)
             continue;
         char to_add[1000];
-        const char* date = article_format_date(article->pub_date);
+        const char* date = article_format_date_web(article->pub_date);
         sprintf(to_add, "<tr><td>%s</td><td><a href='%s'>%s</a></td><td>&nbsp;</td>", date, article->url, article->title);
         str_append(table, to_add, strlen(to_add));
     }
     str_append(table, "</table>", 8);
     // printf("---\n%s\n%zu/%zu\n", table->str, table->len, table->cap);
+    // printf("template:\n%s\n------------------------------\n", template.data);
     char* new_html = str_replace(template.data, "<x-blog-index/>", table->str);
+    // printf("new content:\n%s\n", new_html);
     write_file_content(template_loc, new_html);
     free(new_html);
     str_free(table);
     free(template_loc);
+}
+
+void make_sitemap(Settings settings[static 1], Article* article_list[static 1], size_t article_count) {
+    const char* header =
+        "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\
+<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" \
+xmlns:xhtml=\"http://www.w3.org/1999/xhtml\">\n";
+    str* sitemap = &(str){0};
+    str_append(sitemap, header, strlen(header));
+
+    for (size_t i = 0; i < article_count; i++) {
+        Article* article = article_list[i];
+        char to_add[1000];
+        sprintf(to_add, "<url><loc>%s</loc><lastmod>%s</lastmod></url>\n", article->url, article->pub_date);
+        str_append(sitemap, to_add, strlen(to_add));
+    }
+
+    str_append(sitemap, "</urlset>\n", 10);
+    char* sitemap_loc = str_concat(settings->workdir, "/sitemap.xml");
+    write_file_content(sitemap_loc, sitemap->str);
+}
+
+void make_rss(Settings settings[static 1], Article* article_list[static 1], size_t article_count) {
+    const char* header =
+        "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n\
+<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n\
+  <channel>\n\
+    <title>NobenLog</title>\n\
+    <link>https://noben.org/blog/</link>\n\
+    <description>Recent content on NobenLog</description>\n\
+    <generator>site-gen-c -- https://github.com/keyle/site-gen-c</generator>\n\
+    <language>en-us</language>";
+
+    str* feed = &(str){0};
+    str_append(feed, header, strlen(header));
+
+    sort_articles_date_descending(article_list, article_count);
+
+    for (size_t i = 0; i < article_count; i++) {
+        Article* article = article_list[i];
+        if (!article->is_blog)
+            continue;
+        char to_add[3000];
+        const char* pub_date = article_format_date_rss(article->pub_date);
+        sprintf(to_add, "<item><title>%s</title><link>%s</link><pubDate>%s</pubDate><guid>%s</guid><description><![CDATA[ %s ]]></description></item>\n", article->title, article->url, pub_date, article->url, article->description);
+        str_append(feed, to_add, strlen(to_add));
+    }
+    const char* footer = "</channel></rss>\n";
+    str_append(feed, footer, strlen(footer));
+
+    char* sitemap_loc = str_concat(settings->workdir, "/index.xml");
+    write_file_content(sitemap_loc, feed->str);
+}
+
+// !@#$@#$#%$%^%^&^&* garbage utf-8 fix
+void clean_up(Settings* settings) {
+    char* index_html_loc = str_concat(settings->workdir, "/index.html");
+    if (!index_html_loc) {
+        fprintf(stderr, "could not allocate memory for index.html location\n");
+        exit(1);
+    }
+
+    const file_t index = read_file_content(index_html_loc);
+    if (index.error) {
+        fprintf(stderr, "could not load index.html, aborting\n");
+        exit(1);
+    }
+
+    str* s = &(str){0};
+    const char* data = str_trim(index.data); // trim the index.html
+    str_append(s, data, strlen(data));
+    str_append(s, "\n", 1);
+    write_file_content(index_html_loc, s->str);
 }

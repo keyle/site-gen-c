@@ -6,6 +6,9 @@
 
 void process(Settings*, Article*, const char* markdown_path, char* template_index, char* template_article);
 void write_html(Article*);
-void blog_index(Settings*, Article** article_list, size_t article_count);
+void make_blog_index(Settings*, Article** article_list, size_t article_count);
+void make_sitemap(Settings*, Article** article_list, size_t article_count);
+void make_rss(Settings*, Article** article_list, size_t article_count);
+void clean_up(Settings*);
 
 #endif

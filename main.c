@@ -61,7 +61,10 @@ int main(void) {
         article_list[i] = article;
     }
 
-    blog_index(settings, article_list, count);
+    make_blog_index(settings, article_list, count);
+    make_sitemap(settings, article_list, count);
+    make_rss(settings, article_list, count);
+    clean_up(settings);
 
     return 0;
 }
