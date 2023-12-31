@@ -109,8 +109,6 @@ void make_blog_index(Settings settings[static 1], Article* article_list[static 1
         exit(1);
     }
 
-    // printf("template:\n%s\n", template.data);
-
     sort_articles_date_descending(article_list, article_count);
     str* table = &(str){0};
     str_append(table, "<table>", 7);
@@ -125,10 +123,7 @@ void make_blog_index(Settings settings[static 1], Article* article_list[static 1
         str_append(table, to_add, strlen(to_add));
     }
     str_append(table, "</table>", 8);
-    // printf("---\n%s\n%zu/%zu\n", table->str, table->len, table->cap);
-    // printf("template:\n%s\n------------------------------\n", template.data);
     char* new_html = str_replace(template.data, "<x-blog-index/>", table->str);
-    // printf("new content:\n%s\n", new_html);
     write_file_content(template_loc, new_html);
     free(new_html);
     str_free(table);

@@ -4,7 +4,6 @@
 
 file_t read_file_content(const char file_name[static 1]) {
     FILE* fp = fopen(file_name, "r");
-    // printf("file_name: %s\n", file_name);
 
     if (!fp) {
         fprintf(stderr, "Failed to open file: %s in read_file_content()\n", file_name);
@@ -29,10 +28,6 @@ file_t read_file_content(const char file_name[static 1]) {
         fclose(fp);
         return (file_t){.error = true};
     }
-
-    // if (strcmp(file_name, "/Users/n/Code/noben.org/public/index.html") == 0) {
-    //     printf("content: \n%s\n", content);
-    // }
 
     fclose(fp);
     return (file_t){.data = content, .size = file_size, .error = false};

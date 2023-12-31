@@ -18,7 +18,6 @@ OBJ = $(patsubst %.c, %.o, $(CFILES)) $(patsubst libs/%.c, libs/%.o, $(LIB_CFILE
 %.o: %.c
 	$(COMPILER) $(OBJ_FLAGS) -c $< -o $@
 
-# TODO this needs to be cleaned up as obj_flags are applied to all builds
 # Rule for compiling library .c files into .o files
 libs/%.o: libs/%.c
 	$(COMPILER) $(OBJ_FLAGS) -c $< -o $@

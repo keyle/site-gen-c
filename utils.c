@@ -50,21 +50,6 @@ char *str_last(const char str[static 1], char split) {
     return result;
 }
 
-// bool str_append(char *original[static 1], const char text_to_append[static 1]) {
-//     size_t original_len = *original ? strlen(*original) : 0;
-//     size_t append_len = strlen(text_to_append);
-
-//     char *new_str = realloc(*original, original_len + (append_len * 2) + 1);
-//     if (!new_str) {
-//         fprintf(stderr, "Could not allocate in str_append()");
-//         return false;
-//     }
-
-//     strcpy(new_str + original_len, text_to_append);
-//     *original = new_str;
-//     return true;
-// }
-
 char *str_concat(const char original[static 1], const char text_to_append[static 1]) {
     size_t original_len = strlen(original);
     size_t append_len = strlen(text_to_append);

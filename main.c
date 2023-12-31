@@ -15,25 +15,23 @@ int main(void) {
     int count = 0;
 
     if (!settings) {
-        fprintf(stderr, "could not allocate memory for settings\n");
+        fprintf(stderr, "Could not allocate memory for settings\n");
         exit(1);
     }
 
     char **list = malloc(sizeof(char *) * capacity);
     if (!list) {
-        fprintf(stderr, "could not allocate memory for list\n");
+        fprintf(stderr, "Could not allocate memory for list\n");
         exit(1);
     }
 
     settings_parse(settings);
     if (settings->workdir == NULL) {
-        fprintf(stderr, "could not find workdir\n");
+        fprintf(stderr, "Could not find workdir in settings\n");
         exit(1);
     }
 
     files_find_md(settings->workdir, list, &count, &capacity);
-
-    printf("processed %d files\n", count);
 
     Article **article_list = malloc(sizeof(Article *) * count);
     if (article_list == NULL) {

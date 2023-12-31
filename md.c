@@ -20,7 +20,6 @@ void files_find_md(const char dir_path[static 1], char **list, int count[static 
                 continue;
             if (strcmp(ext, ".md") != 0)
                 continue;
-            printf("found markdown: %s, ext: %s\n", entry->d_name, ext);
             char *md = malloc(strlen(dir_path) + strlen(entry->d_name) + 3);
             strcpy(md, dir_path);
             strcat(md, "/");

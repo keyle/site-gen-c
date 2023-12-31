@@ -13,6 +13,7 @@ void sort_articles_date_descending(Article* article_list[static 1], size_t artic
     qsort(article_list, article_count, sizeof(Article*), compare_articles_date_descending);
 }
 
+// Format blog dates for the index.html
 char* article_format_date_web(const char input[static 1]) {
     struct tm tm;
     char* output = malloc(50); // Allocate memory for the output string
@@ -30,6 +31,7 @@ char* article_format_date_web(const char input[static 1]) {
     return output;
 }
 
+// Format blog posts dates using RFC 822 format
 char* article_format_date_rss(const char input[static 1]) {
     struct tm tm = {0};
     char* output = malloc(100);
@@ -45,7 +47,6 @@ char* article_format_date_rss(const char input[static 1]) {
         tm.tm_sec = 0;
         tm.tm_isdst = -1; // Not set by strptime
 
-        // Using RFC 822 format
         strftime(output, 100, "%a, %d %b %Y %H:%M:%S GMT", &tm);
     } else {
         snprintf(output, 100, "Invalid date");
