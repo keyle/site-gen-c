@@ -2,7 +2,7 @@
 
 This is a static website generator, that includes support for a blog, with vanity urls, keyword tags, RSS, sitemap.xml.
 
-I reimplemented `site-gen-rust` which I wrote in Rust to learn Rust, in OCaml to learn OCaml (which is a rewrite from `site-gen` originally written in Swift). Then I rewrote `site-gen-ocaml` in C in this `site-genc-c`... You get the idea.
+I reimplemented `site-gen-rust` which I wrote in Rust to learn Rust, in OCaml to learn OCaml (which is a rewrite from `site-gen` originally written in Swift). Then I rewrote `site-gen-ocaml` in C, as `site-gen-c`... You get the idea.
 
 Note, the Rust, OCaml and C versions just went further, they're on par feature wise. The `site-gen` in Swift version is out of date, I was still figuring out _what_ this thing should be and how it should work.
 
