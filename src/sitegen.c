@@ -126,7 +126,7 @@ void make_blog_index(settings_t settings[static 1], article_t* article_list[stat
     write_file_content(template_loc, new_html);
 }
 
-void make_sitemap(settings_t settings[static 1], const article_t* article_list[static 1], size_t article_count) {
+void make_sitemap(settings_t settings[static 1], article_t* article_list[static 1], size_t article_count) {
     const char* header =
         "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\
 <urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" \
