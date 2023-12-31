@@ -2,7 +2,7 @@
 #include "article.h"
 #include "utils.h"
 #include "files.h"
-#include "libs/md4c-html.h"
+#include "../libs/md4c-html.h"
 #include <strings.h>
 #include <stdio.h>
 #include <stdlib.h>
