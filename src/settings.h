@@ -12,6 +12,8 @@ typedef struct {
     char* keywords_tag;
 } settings_t;
 
+settings_t* settings_new();
 void settings_parse(settings_t* settings);
+void settings_free(settings_t* settings);
 
 #endif

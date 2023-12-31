@@ -9,8 +9,7 @@
 #define MAX_MD 200
 
 int main(void) {
-    settings_t *settings = malloc(sizeof(settings_t));
-    settings = &(settings_t){0};
+    settings_t *settings = settings_new();
     int capacity = 200;
     int count = 0;
 
@@ -63,6 +62,7 @@ int main(void) {
     make_blog_index(settings, article_list, count);
     make_sitemap(settings, article_list, count);
     make_rss(settings, article_list, count);
+    settings_free(settings);
 
     return 0;
 }

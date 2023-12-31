@@ -13,7 +13,7 @@ void settings_parse(settings_t settings[static 1]) {
         exit(1);
     }
 
-    cJSON *settings_j = cJSON_Parse(settings_f.data);
+    cJSON* settings_j = cJSON_Parse(settings_f.data);
 
     if (!settings_j) {
         fprintf(stderr, "Failed to parse JSON data.\n");
@@ -30,4 +30,26 @@ void settings_parse(settings_t settings[static 1]) {
     settings->keywords_tag = strdup(cJSON_GetObjectItem(settings_j, "keywordstag")->valuestring);
 
     cJSON_Delete(settings_j);
+}
+
+void settings_free(settings_t* settings) {
+    free(settings->workdir);
+    free(settings->webroot);
+    free(settings->template_article);
+    free(settings->template_index);
+    free(settings->content_tag);
+    free(settings->title_tag);
+    free(settings->description_tag);
+    free(settings->keywords_tag);
+    free(settings);
+}
+
+settings_t* settings_new() {
+    settings_t* settings = malloc(sizeof(settings_t));
+    if (!settings) {
+        fprintf(stderr, "Could not allocate memory for settings\n");
+        exit(1);
+    }
+    *settings = (settings_t){0};
+    return settings;
 }
