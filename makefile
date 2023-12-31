@@ -38,3 +38,6 @@ release: $(OBJ)
 
 clean:
 	rm -rf $(APP).* $(APP)* **/*.o *.o
+
+check:
+	cppcheck --check-level=exhaustive --enable=style -j 8 ./src

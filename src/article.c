@@ -4,8 +4,8 @@
 #include <time.h>
 
 int compare_articles_date_descending(const void* a, const void* b) {
-    article_t* article1 = *(article_t**)a;
-    article_t* article2 = *(article_t**)b;
+    const article_t* article1 = *(article_t**)a;
+    const article_t* article2 = *(article_t**)b;
     return strcmp(article2->pub_date, article1->pub_date);
 }
 

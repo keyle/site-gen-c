@@ -66,8 +66,7 @@ void process(settings_t settings[static 1], article_t article[static 1], const c
     // vanity url = settings.webroot + (article.path - settings.workdir - article.file)
     // or in this case, we take the web root, and we append what's between the workdir and the filename,
     // that's the vanity url
-    char* vanity_url = strdup(settings->webroot);
-    article->url = str_concat(vanity_url, str_content_between(article->path, settings->workdir, article->file));
+    article->url = str_concat(strdup(settings->webroot), str_content_between(article->path, settings->workdir, article->file));
 
     char* template = str_contains(markdown, "<x-index/>") ? template_index : template_article;
     char* template_w_content = str_replace(template, settings->content_tag, str_trim(raw_html->str));
@@ -98,7 +97,7 @@ void write_html(article_t article[static 1]) {
 }
 
 void make_blog_index(settings_t settings[static 1], article_t* article_list[static 1], size_t article_count) {
-    char* template_loc = str_concat(settings->workdir, "/index.html");
+    const char* template_loc = str_concat(settings->workdir, "/index.html");
     if (!template_loc) {
         fprintf(stderr, "could not allocate memory for template location in blog_index\n");
         exit(1);
@@ -114,7 +113,7 @@ void make_blog_index(settings_t settings[static 1], article_t* article_list[stat
     str_append(table, "<table>", 7);
 
     for (size_t i = 0; i < article_count; i++) {
-        article_t* article = article_list[i];
+        const article_t* article = article_list[i];
         if (!article->is_blog)
             continue;
         char to_add[1000];
@@ -123,11 +122,11 @@ void make_blog_index(settings_t settings[static 1], article_t* article_list[stat
         str_append(table, to_add, strlen(to_add));
     }
     str_append(table, "</table>", 8);
-    char* new_html = str_replace(template.data, "<x-blog-index/>", table->str);
+    const char* new_html = str_replace(template.data, "<x-blog-index/>", table->str);
     write_file_content(template_loc, new_html);
 }
 
-void make_sitemap(settings_t settings[static 1], article_t* article_list[static 1], size_t article_count) {
+void make_sitemap(settings_t settings[static 1], const article_t* article_list[static 1], size_t article_count) {
     const char* header =
         "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\
 <urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" \
@@ -136,14 +135,14 @@ xmlns:xhtml=\"http://www.w3.org/1999/xhtml\">\n";
     str_append(sitemap, header, strlen(header));
 
     for (size_t i = 0; i < article_count; i++) {
-        article_t* article = article_list[i];
+        const article_t* article = article_list[i];
         char to_add[1000];
         sprintf(to_add, "<url><loc>%s</loc><lastmod>%s</lastmod></url>\n", article->url, article->pub_date);
         str_append(sitemap, to_add, strlen(to_add));
     }
 
     str_append(sitemap, "</urlset>\n", 10);
-    char* sitemap_loc = str_concat(settings->workdir, "/sitemap.xml");
+    const char* sitemap_loc = str_concat(settings->workdir, "/sitemap.xml");
     write_file_content(sitemap_loc, sitemap->str);
 }
 
@@ -164,7 +163,7 @@ void make_rss(settings_t settings[static 1], article_t* article_list[static 1], 
     sort_articles_date_descending(article_list, article_count);
 
     for (size_t i = 0; i < article_count; i++) {
-        article_t* article = article_list[i];
+        const article_t* article = article_list[i];
         if (!article->is_blog)
             continue;
         char to_add[3000];
@@ -175,6 +174,6 @@ void make_rss(settings_t settings[static 1], article_t* article_list[static 1], 
     const char* footer = "</channel></rss>\n";
     str_append(feed, footer, strlen(footer));
 
-    char* sitemap_loc = str_concat(settings->workdir, "/index.xml");
+    const char* sitemap_loc = str_concat(settings->workdir, "/index.xml");
     write_file_content(sitemap_loc, feed->str);
 }

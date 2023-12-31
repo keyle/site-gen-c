@@ -51,7 +51,7 @@ int main(void) {
     }
 
     for (int i = 0; i < count; i++) {
-        char *md_file = list[i];
+        const char *md_file = list[i];
         article_t *article = malloc(sizeof(article_t));
         *article = (article_t){0};
         process(settings, article, md_file, template_index.data, template_article.data);

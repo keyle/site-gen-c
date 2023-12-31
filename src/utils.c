@@ -16,7 +16,7 @@ char *str_content_between(char *contents, const char start[static 1], const char
         return NULL;
     }
 
-    char *end_pos = strstr(start_pos + strlen(start), end);
+    const char *end_pos = strstr(start_pos + strlen(start), end);
     if (end_pos == NULL) {
         return NULL;
     }
@@ -156,7 +156,7 @@ void free_str_split(char *str_array[static 1]) {
 
 char *now_date() {
     time_t current_time;
-    struct tm *current_tm;
+    const struct tm *current_tm;
     time(&current_time);
     current_tm = localtime(&current_time);
     char *date_time = malloc(30 * sizeof(char));

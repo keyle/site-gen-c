@@ -6,7 +6,7 @@
 
 void files_find_md(const char dir_path[static 1], char **list, int count[static 1], int capacity[static 1]) {
     DIR *dir;
-    struct dirent *entry;
+    const struct dirent *entry;
 
     if ((dir = opendir(dir_path)) == NULL) {
         printf("Could not open directory %s\n", dir_path);
@@ -15,7 +15,7 @@ void files_find_md(const char dir_path[static 1], char **list, int count[static 
 
     while ((entry = readdir(dir)) != NULL) {
         if (entry->d_type != DT_DIR) {
-            char *ext = strrchr(entry->d_name, '\0') - 3;
+            const char *ext = strrchr(entry->d_name, '\0') - 3;
             if (!ext || ext == entry->d_name)
                 continue;
             if (strcmp(ext, ".md") != 0)
