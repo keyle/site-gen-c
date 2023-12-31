@@ -34,7 +34,6 @@ char *str_last(const char str[static 1], char split) {
 
     if (last_occurrence == NULL) {
         // The split character isn't found in the string.
-        // You can either return NULL or a copy of the original string.
         return NULL;
     }
 
@@ -91,7 +90,7 @@ char *str_trim(const char input[static 1]) {
     }
 
     strncpy(trimmed, start, length);
-    trimmed[length] = '\0'; // Null-terminate the string
+    trimmed[length] = '\0';
 
     return trimmed;
 }
@@ -130,7 +129,7 @@ char **str_split(const char input[static 1], const char delimiter) {
                 return NULL;
             }
             memcpy(result[index], start, length);
-            result[index][length] = '\0'; // Null terminate the string
+            result[index][length] = '\0';
             index++;
 
             if (*it == '\0') {
