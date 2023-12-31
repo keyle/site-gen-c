@@ -9,8 +9,8 @@
 #define MAX_MD 200
 
 int main(void) {
-    Settings *settings = malloc(sizeof(Settings));
-    settings = &(Settings){0};
+    settings_t *settings = malloc(sizeof(settings_t));
+    settings = &(settings_t){0};
     int capacity = 200;
     int count = 0;
 
@@ -33,7 +33,7 @@ int main(void) {
 
     files_find_md(settings->workdir, list, &count, &capacity);
 
-    Article **article_list = malloc(sizeof(Article *) * count);
+    article_t **article_list = malloc(sizeof(article_t *) * count);
     if (article_list == NULL) {
         printf("could not allocate memory for articles\n");
         exit(1);
@@ -53,8 +53,8 @@ int main(void) {
 
     for (int i = 0; i < count; i++) {
         char *md_file = list[i];
-        Article *article = malloc(sizeof(Article));
-        *article = (Article){0};
+        article_t *article = malloc(sizeof(article_t));
+        *article = (article_t){0};
         process(settings, article, md_file, template_index.data, template_article.data);
         write_html(article);
         article_list[i] = article;
@@ -63,7 +63,6 @@ int main(void) {
     make_blog_index(settings, article_list, count);
     make_sitemap(settings, article_list, count);
     make_rss(settings, article_list, count);
-    clean_up(settings);
 
     return 0;
 }

@@ -17,7 +17,7 @@ void md_parse_progress(const MD_CHAR output[static 1], MD_SIZE size, void* userd
     str_append(s, output, size);
 }
 
-void process(Settings settings[static 1], Article article[static 1], const char markdown_path[static 1], char template_index[static 1], char template_article[static 1]) {
+void process(settings_t settings[static 1], article_t article[static 1], const char markdown_path[static 1], char template_index[static 1], char template_article[static 1]) {
     const file_t loaded = read_file_content(markdown_path);
     if (loaded.error) {
         fprintf(stderr, "Could not read file %s, aborting.\n", markdown_path);
@@ -87,7 +87,7 @@ void process(Settings settings[static 1], Article article[static 1], const char 
     article->html = template_w_keywords;
 }
 
-void write_html(Article article[static 1]) {
+void write_html(article_t article[static 1]) {
     const char* html_path = str_replace(article->path, article->file, "");
     const char* target = str_concat(html_path, "index.html");
     result_t res = write_file_content(target, article->html);
@@ -97,7 +97,7 @@ void write_html(Article article[static 1]) {
     }
 }
 
-void make_blog_index(Settings settings[static 1], Article* article_list[static 1], size_t article_count) {
+void make_blog_index(settings_t settings[static 1], article_t* article_list[static 1], size_t article_count) {
     char* template_loc = str_concat(settings->workdir, "/index.html");
     if (!template_loc) {
         fprintf(stderr, "could not allocate memory for template location in blog_index\n");
@@ -114,7 +114,7 @@ void make_blog_index(Settings settings[static 1], Article* article_list[static 1
     str_append(table, "<table>", 7);
 
     for (size_t i = 0; i < article_count; i++) {
-        Article* article = article_list[i];
+        article_t* article = article_list[i];
         if (!article->is_blog)
             continue;
         char to_add[1000];
@@ -127,7 +127,7 @@ void make_blog_index(Settings settings[static 1], Article* article_list[static 1
     write_file_content(template_loc, new_html);
 }
 
-void make_sitemap(Settings settings[static 1], Article* article_list[static 1], size_t article_count) {
+void make_sitemap(settings_t settings[static 1], article_t* article_list[static 1], size_t article_count) {
     const char* header =
         "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\
 <urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" \
@@ -136,7 +136,7 @@ xmlns:xhtml=\"http://www.w3.org/1999/xhtml\">\n";
     str_append(sitemap, header, strlen(header));
 
     for (size_t i = 0; i < article_count; i++) {
-        Article* article = article_list[i];
+        article_t* article = article_list[i];
         char to_add[1000];
         sprintf(to_add, "<url><loc>%s</loc><lastmod>%s</lastmod></url>\n", article->url, article->pub_date);
         str_append(sitemap, to_add, strlen(to_add));
@@ -147,7 +147,7 @@ xmlns:xhtml=\"http://www.w3.org/1999/xhtml\">\n";
     write_file_content(sitemap_loc, sitemap->str);
 }
 
-void make_rss(Settings settings[static 1], Article* article_list[static 1], size_t article_count) {
+void make_rss(settings_t settings[static 1], article_t* article_list[static 1], size_t article_count) {
     const char* header =
         "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n\
 <rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n\
@@ -164,7 +164,7 @@ void make_rss(Settings settings[static 1], Article* article_list[static 1], size
     sort_articles_date_descending(article_list, article_count);
 
     for (size_t i = 0; i < article_count; i++) {
-        Article* article = article_list[i];
+        article_t* article = article_list[i];
         if (!article->is_blog)
             continue;
         char to_add[3000];
@@ -177,25 +177,4 @@ void make_rss(Settings settings[static 1], Article* article_list[static 1], size
 
     char* sitemap_loc = str_concat(settings->workdir, "/index.xml");
     write_file_content(sitemap_loc, feed->str);
-}
-
-// !@#$@#$#%$%^%^&^&* garbage utf-8 fix
-void clean_up(Settings* settings) {
-    char* index_html_loc = str_concat(settings->workdir, "/index.html");
-    if (!index_html_loc) {
-        fprintf(stderr, "could not allocate memory for index.html location\n");
-        exit(1);
-    }
-
-    const file_t index = read_file_content(index_html_loc);
-    if (index.error) {
-        fprintf(stderr, "could not load index.html, aborting\n");
-        exit(1);
-    }
-
-    str* s = &(str){0};
-    const char* data = str_trim(index.data); // trim the index.html
-    str_append(s, data, strlen(data));
-    str_append(s, "\n", 1);
-    write_file_content(index_html_loc, s->str);
 }

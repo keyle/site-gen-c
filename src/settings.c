@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <strings.h>
 
-void settings_parse(Settings settings[static 1]) {
+void settings_parse(settings_t settings[static 1]) {
     const file_t settings_f = read_file_content("/Users/n/.config/site-gen/settings.json");
 
     if (settings_f.error) {

@@ -15,9 +15,9 @@ typedef struct {
     char* tags;
     char* pub_date;
     bool is_blog;
-} Article;
+} article_t;
 
-void sort_articles_date_descending(Article** article_list, size_t article_count);
+void sort_articles_date_descending(article_t** article_list, size_t article_count);
 char* article_format_date_web(const char* input);
 char* article_format_date_rss(const char* input);
 

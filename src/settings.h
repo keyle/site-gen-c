@@ -10,8 +10,8 @@ typedef struct {
     char* title_tag;
     char* description_tag;
     char* keywords_tag;
-} Settings;
+} settings_t;
 
-void settings_parse(Settings* settings);
+void settings_parse(settings_t* settings);
 
 #endif
